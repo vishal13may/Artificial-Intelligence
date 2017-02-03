@@ -33,6 +33,7 @@ class Node:
         self.type = type
         self.alpha = alpha
         self.beta = beta
+        self.value = value
         self.children = children
 
 def find_valid_moves(start_player,board_position):
@@ -139,8 +140,8 @@ def find_next_moves(max_depth,board_position,player,max_min_counter,root):
         # Call evaluation function
         for child in root.children:
             board = changeBoard(board_position,previous_player,child.position)
-            value = find_move_value(board,start_player)
-            print value
+            child.value = find_move_value(board,start_player)
+            print child.value
         return
 
     if root.name == "root" and max_min_counter == 2 :
@@ -246,7 +247,7 @@ def find_move_value(board_position,start_player):
 
 def print_tree(root):
 
-    print "Name =" + root.name + " Alpha =" + str(root.alpha) + " Beta =" + str(root.beta) + " Position =" + str(root.position) + " Type =" + root.type
+    print "Name =" + root.name + " Value =" + str(root.value) +" Alpha =" + str(root.alpha) + " Beta =" + str(root.beta) + " Position =" + str(root.position) + " Type =" + root.type
 
     if len(root.children) == 0 :
         return
