@@ -139,7 +139,9 @@ def find_next_moves(max_depth,board_position,player,max_min_counter,root):
     if max_depth < 1 :
         # Call evaluation function
         for child in root.children:
-            board = changeBoard(board_position,previous_player,child.position)
+            board = board_position
+            if child.name != "Pass" :
+                board = changeBoard(board_position,previous_player,child.position)
             child.value = find_move_value(board,start_player)
             print child.value
         return
@@ -187,7 +189,7 @@ def find_next_moves(max_depth,board_position,player,max_min_counter,root):
             children = []
             move = []
             node = Node(name,move,type,-99999,99999,value,children)
-            root.children[0].childre.append(node)
+            root.children[0].children.append(node)
         else :
             for move in nextValidMoves :
                 name = dic[move[1]] + str(move[0]+1)
