@@ -126,7 +126,7 @@ def changeBoard(board,player,move):
 
     return newBoard
 
-def find_next_moves(max_depth,board_position,player,max_min_counter,root):
+def find_next_moves(max_depth,board_position,player,max_min_counter,root,pass_counter):
 
     previous_player = 'X'
     if player == 'X':
@@ -136,7 +136,8 @@ def find_next_moves(max_depth,board_position,player,max_min_counter,root):
     if player == 'X':
         next_player = 'O'
 
-    if max_depth < 1 :
+    if max_depth < 1 or pass_counter == 2 :
+        #print "*+++*" + root.name + str(pass_counter)
         # Call evaluation function
         for child in root.children:
             board = board_position
@@ -147,8 +148,12 @@ def find_next_moves(max_depth,board_position,player,max_min_counter,root):
         return
 
     if root.name == "root" and max_min_counter == 2 :
+        if pass_counter == 2:
+            print "Game over"
+            return
         nextValidMoves = find_valid_moves(player,board_position)
         if len(nextValidMoves) == 0:
+            pass_counter += 1
             name = "Pass"
             type = 'MAX'
             if max_min_counter % 2 == 0 :
@@ -161,6 +166,7 @@ def find_next_moves(max_depth,board_position,player,max_min_counter,root):
             node = Node(name,move,type,-99999,99999,value,children)
             root.children.append(node)
         else:
+            pass_counter = 0
             for move in nextValidMoves :
                 name = dic[move[1]] + str(move[0]+1)
                 type = 'MAX'
@@ -172,13 +178,18 @@ def find_next_moves(max_depth,board_position,player,max_min_counter,root):
                 children = []
                 node = Node(name,move,type,-99999,99999,value,children)
                 root.children.append(node)
-
-        find_next_moves(max_depth-1,board_position,next_player,max_min_counter+1,root)
+        #print "call function:" + root.name + " " + str(pass_counter)
+        find_next_moves(max_depth-1,board_position,next_player,max_min_counter+1,root,pass_counter)
 
     elif len(root.children) == 1 and root.children[0].name == "Pass":
+        if pass_counter == 2:
+            print "Game over"
+            return
         #print "pass"
+        #print "**********"+ root.name + " " +str(pass_counter)
         nextValidMoves = find_valid_moves(player,board_position)
         if len(nextValidMoves) == 0:
+            pass_counter += 1
             name = "Pass"
             type = 'MAX'
             if max_min_counter % 2 == 0 :
@@ -191,6 +202,7 @@ def find_next_moves(max_depth,board_position,player,max_min_counter,root):
             node = Node(name,move,type,-99999,99999,value,children)
             root.children[0].children.append(node)
         else :
+            pass_counter = 0
             for move in nextValidMoves :
                 name = dic[move[1]] + str(move[0]+1)
                 type = 'MAX'
@@ -202,13 +214,20 @@ def find_next_moves(max_depth,board_position,player,max_min_counter,root):
                 children = []
                 node = Node(name,move,type,-99999,99999,value,children)
                 root.children[0].children.append(node)
-        find_next_moves(max_depth-1,board_position,next_player,max_min_counter+1,root.children[0])
+        #print "call function:" + root.name + " " + str(pass_counter)
+        find_next_moves(max_depth-1,board_position,next_player,max_min_counter+1,root.children[0],pass_counter)
     else :
+        if pass_counter == 2:
+            print "Game over"
+            return
         for child in root.children :
             #change the board
+            #print "**Else:" + child.name
             newBoard = changeBoard(board_position,previous_player,child.position)
             nextValidMoves = find_valid_moves(player,newBoard)
+            pass_counter = 0
             if len(nextValidMoves) == 0:
+                pass_counter += 1
                 name = "Pass"
                 type = 'MAX'
                 if max_min_counter % 2 == 0 :
@@ -219,9 +238,11 @@ def find_next_moves(max_depth,board_position,player,max_min_counter,root):
                 children = []
                 move = []
                 node = Node(name,move,type,-99999,99999,value,children)
+                #print child.name + "***" + node.name
                 child.children.append(node)
             else :
                 for move in nextValidMoves :
+                    pass_counter = 0
                     name = dic[move[1]] + str(move[0]+1)
                     type = 'MAX'
                     if max_min_counter % 2 == 0 :
@@ -232,7 +253,8 @@ def find_next_moves(max_depth,board_position,player,max_min_counter,root):
                     children = []
                     node = Node(name,move,type,-99999,99999,value,children)
                     child.children.append(node)
-            find_next_moves(max_depth-1,newBoard,next_player,max_min_counter+1,child)
+            #print "**call function:" + child.name + " " + str(pass_counter)
+            find_next_moves(max_depth-1,newBoard,next_player,max_min_counter+1,child,pass_counter)
     return
 
 def find_move_value(board_position,start_player):
@@ -259,6 +281,35 @@ def print_tree(root):
 
     return
 
+def MAX_VALUE(node,alpha,beta):
+
+    if len(node.children) == 0:
+        return node.value
+
+    v = -99999
+
+    for child in node.children :
+        v = max(v,MIN_VALUE(child,alpha,beta))
+        if v >= beta :
+            return v
+        alpha = max(v,alpha)
+
+    return v
+
+def MIN_VALUE(node,alpha,beta):
+    if len(node.children) == 0:
+        return node.value
+
+    v = 99999
+
+    for child in node.children :
+        v = min(v,MAX_VALUE(child,alpha,beta))
+        if v <= alpha :
+            return v
+        beta = min(beta,v)
+
+    return v
+
 if __name__ == "__main__":
     start_player,max_depth,initial_board_position = read_Input_File("input.txt")
     othello = Othello(start_player,max_depth,initial_board_position)
@@ -274,11 +325,17 @@ if __name__ == "__main__":
 
     root = Node("root",position,"MAX",-99999,99999,-99999,children)
 
-    find_next_moves(max_depth,initial_board_position,start_player,2,root)
+    pass_counter = 0
+
+    find_next_moves(max_depth,initial_board_position,start_player,2,root,pass_counter)
 
     #print len(root.children)
 
     print_tree(root)
+
+    # call alpha beta pruning
+    v = MAX_VALUE(root,-99999,99999)
+    print "** Value ** :" + str(v)
 
     '''for move in validMoves :
         #change the board
