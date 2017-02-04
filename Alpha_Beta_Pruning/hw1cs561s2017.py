@@ -282,32 +282,29 @@ def print_tree(root):
     return
 
 def MAX_VALUE(node,alpha,beta):
-
     if len(node.children) == 0:
         return node.value
-
     v = -99999
-
     for child in node.children :
-        v = max(v,MIN_VALUE(child,alpha,beta))
+        x = MIN_VALUE(child,alpha,beta)
+        if x > v :
+            global final_move
+            final_move = child.position
+            v = x
         if v >= beta :
             return v
         alpha = max(v,alpha)
-
     return v
 
 def MIN_VALUE(node,alpha,beta):
     if len(node.children) == 0:
         return node.value
-
     v = 99999
-
     for child in node.children :
         v = min(v,MAX_VALUE(child,alpha,beta))
         if v <= alpha :
             return v
         beta = min(beta,v)
-
     return v
 
 if __name__ == "__main__":
@@ -334,8 +331,21 @@ if __name__ == "__main__":
     print_tree(root)
 
     # call alpha beta pruning
+    final_move = []
     v = MAX_VALUE(root,-99999,99999)
     print "** Value ** :" + str(v)
+    print "Final Move:" + str(final_move)
+
+    if len(final_move) == 0:
+        final_board = initial_board_position
+    else:
+        final_board = changeBoard(initial_board_position,start_player,final_move)
+
+    for row in range(0,8):
+        value = ""
+        for column in range(0,8):
+            value = value + final_board[row][column]
+        print value
 
     '''for move in validMoves :
         #change the board
