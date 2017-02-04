@@ -50,7 +50,7 @@ def find_valid_moves(start_player,board_position):
                 move = dic[column] + str(row+1)
                 vMoves.append(move)
                 validMoves.append([row,column])
-    print vMoves
+    #print vMoves
     return validMoves
 
 def isValidMove(row,column,player,board_position):
@@ -145,12 +145,12 @@ def find_next_moves(max_depth,board_position,player,max_min_counter,root,pass_co
             if child.name != "pass" :
                 board = changeBoard(board_position,previous_player,child.position)
             child.value = find_move_value(board,start_player)
-            print child.value
+            #print child.value
         return
 
     if root.name == "root" and max_min_counter == 2 :
         if pass_counter == 2:
-            print "Game over"
+            #print "Game over"
             return
         nextValidMoves = find_valid_moves(player,board_position)
         if len(nextValidMoves) == 0:
@@ -184,7 +184,7 @@ def find_next_moves(max_depth,board_position,player,max_min_counter,root,pass_co
 
     elif len(root.children) == 1 and root.children[0].name == "pass":
         if pass_counter == 2:
-            print "Game over"
+            #print "Game over"
             return
         #print "pass"
         #print "**********"+ root.name + " " +str(pass_counter)
@@ -219,7 +219,7 @@ def find_next_moves(max_depth,board_position,player,max_min_counter,root,pass_co
         find_next_moves(max_depth-1,board_position,next_player,max_min_counter+1,root.children[0],pass_counter,current_depth+1)
     else :
         if pass_counter == 2:
-            print "Game over"
+            #print "Game over"
             return
         for child in root.children :
             #change the board
@@ -271,7 +271,7 @@ def find_move_value(board_position,start_player):
     return (start_player_value - opposite_player_value)
 
 def print_tree(root):
-    print "Name =" + root.name + " Value =" + str(root.value) +" Alpha =" + str(root.alpha) + " Beta =" + str(root.beta) + " Position =" + str(root.position) + " Type =" + root.type
+    #print "Name =" + root.name + " Value =" + str(root.value) +" Alpha =" + str(root.alpha) + " Beta =" + str(root.beta) + " Position =" + str(root.position) + " Type =" + root.type
     if len(root.children) == 0 :
         return
     for child in root.children :
@@ -300,7 +300,7 @@ def print_log(name,depth,value,alpha,beta):
 
 def MAX_VALUE(node,alpha,beta):
     if len(node.children) == 0:
-        print "MAX",node.name,0,node.value,alpha,beta
+        #print "MAX",node.name,0,node.value,alpha,beta
         print_log(node.name,node.depth,node.value,alpha,beta)
         return node.value
     v = -99999
@@ -313,9 +313,10 @@ def MAX_VALUE(node,alpha,beta):
             final_move = child.position
             v = x
         node.value = v
+        old_alpha = alpha
         alpha = max(alpha,v)
         if v >= beta :
-            print_log(node.name,node.depth,v,alpha,beta)
+            print_log(node.name,node.depth,v,old_alpha,beta)
             #print node.name,node.depth,node.value,alpha,beta
             return v
         print_log(node.name,node.depth,v,alpha,beta)
@@ -325,7 +326,7 @@ def MAX_VALUE(node,alpha,beta):
 def MIN_VALUE(node,alpha,beta):
     if len(node.children) == 0:
         print_log(node.name,node.depth,node.value,alpha,beta)
-        print "MIN",node.name,node.depth,node.value,alpha,beta
+        #print "MIN",node.name,node.depth,node.value,alpha,beta
         return node.value
     v = 99999
     print_log(node.name,node.depth,v,alpha,beta)
@@ -333,9 +334,10 @@ def MIN_VALUE(node,alpha,beta):
     for child in node.children :
         v = min(v,MAX_VALUE(child,alpha,beta))
         node.value = v
+        old_beta = beta
         beta = min(beta,v)
         if v <= alpha :
-            print_log(node.name,node.depth,v,alpha,beta)
+            print_log(node.name,node.depth,v,alpha,old_beta)
             #print node.name,node.depth,node.value,alpha,beta
             return v
         print_log(node.name,node.depth,v,alpha,beta)
@@ -363,7 +365,7 @@ if __name__ == "__main__":
 
     #print len(root.children)
 
-    print_tree(root)
+    #print_tree(root)
 
     logs = []
     execution_order_logs = []
@@ -371,8 +373,8 @@ if __name__ == "__main__":
     # call alpha beta pruning
     final_move = []
     v = MAX_VALUE(root,-99999,99999)
-    print "** Value ** :" + str(v)
-    print "Final Move:" + str(final_move)
+    #print "** Value ** :" + str(v)
+    #print "Final Move:" + str(final_move)
 
     if len(final_move) == 0:
         final_board = initial_board_position
@@ -390,11 +392,11 @@ if __name__ == "__main__":
 
     # Final Results
 
-    print "********** Final Results **********"
+    '''print "********** Final Results **********"
     for log in logs:
         print log
     for execution_order_log in execution_order_logs:
-        print execution_order_log
+        print execution_order_log'''
 
     # Write to file
     with open("output.txt",'w') as file_handler:
