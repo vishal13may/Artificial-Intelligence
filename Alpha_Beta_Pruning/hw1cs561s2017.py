@@ -396,6 +396,13 @@ if __name__ == "__main__":
     for execution_order_log in execution_order_logs:
         print execution_order_log
 
+    # Write to file
+    with open("output.txt",'w') as file_handler:
+        for log in logs:
+            file_handler.write(log+'\n')
+        for execution_order_log in execution_order_logs:
+            file_handler.write(execution_order_log+'\n')
+
     '''for move in validMoves :
         #change the board
         newBoard = changeBoard(initial_board_position,start_player,move)
