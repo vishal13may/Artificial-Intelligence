@@ -27,13 +27,14 @@ class Othello:
         self.board_position = board_position
 
 class Node:
-    def __init__(self,name,position,type,alpha,beta,value,children):
+    def __init__(self,name,position,type,alpha,beta,value,depth,children):
         self.name = name
         self.position = position
         self.type = type
         self.alpha = alpha
         self.beta = beta
         self.value = value
+        self.depth = depth
         self.children = children
 
 def find_valid_moves(start_player,board_position):
@@ -126,7 +127,7 @@ def changeBoard(board,player,move):
 
     return newBoard
 
-def find_next_moves(max_depth,board_position,player,max_min_counter,root,pass_counter):
+def find_next_moves(max_depth,board_position,player,max_min_counter,root,pass_counter,current_depth):
 
     previous_player = 'X'
     if player == 'X':
@@ -163,7 +164,7 @@ def find_next_moves(max_depth,board_position,player,max_min_counter,root,pass_co
                 value = -99999
             children = []
             move = []
-            node = Node(name,move,type,-99999,99999,value,children)
+            node = Node(name,move,type,-99999,99999,value,current_depth,children)
             root.children.append(node)
         else:
             pass_counter = 0
@@ -176,10 +177,10 @@ def find_next_moves(max_depth,board_position,player,max_min_counter,root,pass_co
                 if type == "MAX":
                     value = -99999
                 children = []
-                node = Node(name,move,type,-99999,99999,value,children)
+                node = Node(name,move,type,-99999,99999,value,current_depth,children)
                 root.children.append(node)
         #print "call function:" + root.name + " " + str(pass_counter)
-        find_next_moves(max_depth-1,board_position,next_player,max_min_counter+1,root,pass_counter)
+        find_next_moves(max_depth-1,board_position,next_player,max_min_counter+1,root,pass_counter,current_depth+1)
 
     elif len(root.children) == 1 and root.children[0].name == "Pass":
         if pass_counter == 2:
@@ -199,7 +200,7 @@ def find_next_moves(max_depth,board_position,player,max_min_counter,root,pass_co
                 value = -99999
             children = []
             move = []
-            node = Node(name,move,type,-99999,99999,value,children)
+            node = Node(name,move,type,-99999,99999,value,current_depth,children)
             root.children[0].children.append(node)
         else :
             pass_counter = 0
@@ -212,10 +213,10 @@ def find_next_moves(max_depth,board_position,player,max_min_counter,root,pass_co
                 if type == "MAX":
                     value = -99999
                 children = []
-                node = Node(name,move,type,-99999,99999,value,children)
+                node = Node(name,move,type,-99999,99999,value,current_depth,children)
                 root.children[0].children.append(node)
         #print "call function:" + root.name + " " + str(pass_counter)
-        find_next_moves(max_depth-1,board_position,next_player,max_min_counter+1,root.children[0],pass_counter)
+        find_next_moves(max_depth-1,board_position,next_player,max_min_counter+1,root.children[0],pass_counter,current_depth+1)
     else :
         if pass_counter == 2:
             print "Game over"
@@ -237,7 +238,7 @@ def find_next_moves(max_depth,board_position,player,max_min_counter,root,pass_co
                     value = -99999
                 children = []
                 move = []
-                node = Node(name,move,type,-99999,99999,value,children)
+                node = Node(name,move,type,-99999,99999,value,current_depth,children)
                 #print child.name + "***" + node.name
                 child.children.append(node)
             else :
@@ -251,10 +252,10 @@ def find_next_moves(max_depth,board_position,player,max_min_counter,root,pass_co
                     if type == "MAX":
                         value = -99999
                     children = []
-                    node = Node(name,move,type,-99999,99999,value,children)
+                    node = Node(name,move,type,-99999,99999,value,current_depth,children)
                     child.children.append(node)
             #print "**call function:" + child.name + " " + str(pass_counter)
-            find_next_moves(max_depth-1,newBoard,next_player,max_min_counter+1,child,pass_counter)
+            find_next_moves(max_depth-1,newBoard,next_player,max_min_counter+1,child,pass_counter,current_depth+1)
     return
 
 def find_move_value(board_position,start_player):
@@ -270,41 +271,71 @@ def find_move_value(board_position,start_player):
     return (start_player_value - opposite_player_value)
 
 def print_tree(root):
-
     print "Name =" + root.name + " Value =" + str(root.value) +" Alpha =" + str(root.alpha) + " Beta =" + str(root.beta) + " Position =" + str(root.position) + " Type =" + root.type
-
     if len(root.children) == 0 :
         return
-
     for child in root.children :
         print_tree(child)
+    return
 
+def print_log(name,depth,value,alpha,beta):
+    alpha_v = str(alpha)
+    if alpha == -99999:
+        alpha_v = "-Infinity"
+    beta_v = str(beta)
+    if beta == 99999 :
+        beta_v = "Infinity"
+    node_value = str(value)
+    if value == -99999:
+        node_value = "-Infinity"
+    elif value == 99999:
+        node_value = "Infinity"
+    log = name+","+str(depth)+","+node_value+","+alpha_v+","+beta_v
+    execution_order_logs.append(log)
     return
 
 def MAX_VALUE(node,alpha,beta):
     if len(node.children) == 0:
+        #print node.name,0,node.value,alpha,beta
+        print_log(node.name,node.depth,node.value,alpha,beta)
         return node.value
     v = -99999
-    for child in node.children :
+    print_log(node.name,node.depth,node.value,alpha,beta)
+    #print node.name,0,node.value,alpha,beta
+    for child in node.children:
         x = MIN_VALUE(child,alpha,beta)
         if x > v :
             global final_move
             final_move = child.position
             v = x
+        node.value = v
         if v >= beta :
+            print_log(node.name,node.depth,node.value,alpha,beta)
+            #print node.name,node.depth,node.value,alpha,beta
             return v
-        alpha = max(v,alpha)
+        alpha = max(alpha,v)
+        print_log(node.name,node.depth,node.value,alpha,beta)
+        #print node.name,node.depth,node.value,alpha,beta
     return v
 
 def MIN_VALUE(node,alpha,beta):
     if len(node.children) == 0:
+        print_log(node.name,node.depth,node.value,alpha,beta)
+        #print node.name,node.depth,node.value,alpha,beta
         return node.value
     v = 99999
+    print_log(node.name,node.depth,node.value,alpha,beta)
+    #print node.name,node.depth,node.value,alpha,beta
     for child in node.children :
         v = min(v,MAX_VALUE(child,alpha,beta))
+        node.value = v
         if v <= alpha :
+            print_log(node.name,node.depth,node.value,alpha,beta)
+            #print node.name,node.depth,node.value,alpha,beta
             return v
         beta = min(beta,v)
+        print_log(node.name,node.depth,node.value,alpha,beta)
+        #print node.name,node.depth,node.value,alpha,beta
     return v
 
 if __name__ == "__main__":
@@ -320,15 +351,18 @@ if __name__ == "__main__":
     children = []
     position = []
 
-    root = Node("root",position,"MAX",-99999,99999,-99999,children)
+    root = Node("root",position,"MAX",-99999,99999,-99999,0,children)
 
     pass_counter = 0
 
-    find_next_moves(max_depth,initial_board_position,start_player,2,root,pass_counter)
+    find_next_moves(max_depth,initial_board_position,start_player,2,root,pass_counter,1)
 
     #print len(root.children)
 
     print_tree(root)
+
+    logs = []
+    execution_order_logs = []
 
     # call alpha beta pruning
     final_move = []
@@ -345,7 +379,18 @@ if __name__ == "__main__":
         value = ""
         for column in range(0,8):
             value = value + final_board[row][column]
-        print value
+        logs.append(value)
+
+    logs.append("Node,Depth,Value,Alpha,Beta")
+
+
+    # Final Results
+
+    print "********** Final Results **********"
+    for log in logs:
+        print log
+    for execution_order_log in execution_order_logs:
+        print execution_order_log
 
     '''for move in validMoves :
         #change the board
