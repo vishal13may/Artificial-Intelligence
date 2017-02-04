@@ -142,7 +142,7 @@ def find_next_moves(max_depth,board_position,player,max_min_counter,root,pass_co
         # Call evaluation function
         for child in root.children:
             board = board_position
-            if child.name != "Pass" :
+            if child.name != "pass" :
                 board = changeBoard(board_position,previous_player,child.position)
             child.value = find_move_value(board,start_player)
             print child.value
@@ -155,7 +155,7 @@ def find_next_moves(max_depth,board_position,player,max_min_counter,root,pass_co
         nextValidMoves = find_valid_moves(player,board_position)
         if len(nextValidMoves) == 0:
             pass_counter += 1
-            name = "Pass"
+            name = "pass"
             type = 'MAX'
             if max_min_counter % 2 == 0 :
                 type = 'MIN'
@@ -182,7 +182,7 @@ def find_next_moves(max_depth,board_position,player,max_min_counter,root,pass_co
         #print "call function:" + root.name + " " + str(pass_counter)
         find_next_moves(max_depth-1,board_position,next_player,max_min_counter+1,root,pass_counter,current_depth+1)
 
-    elif len(root.children) == 1 and root.children[0].name == "Pass":
+    elif len(root.children) == 1 and root.children[0].name == "pass":
         if pass_counter == 2:
             print "Game over"
             return
@@ -191,7 +191,7 @@ def find_next_moves(max_depth,board_position,player,max_min_counter,root,pass_co
         nextValidMoves = find_valid_moves(player,board_position)
         if len(nextValidMoves) == 0:
             pass_counter += 1
-            name = "Pass"
+            name = "pass"
             type = 'MAX'
             if max_min_counter % 2 == 0 :
                 type = 'MIN'
@@ -229,7 +229,7 @@ def find_next_moves(max_depth,board_position,player,max_min_counter,root,pass_co
             pass_counter = 0
             if len(nextValidMoves) == 0:
                 pass_counter += 1
-                name = "Pass"
+                name = "pass"
                 type = 'MAX'
                 if max_min_counter % 2 == 0 :
                     type = 'MIN'
@@ -282,9 +282,13 @@ def print_log(name,depth,value,alpha,beta):
     alpha_v = str(alpha)
     if alpha == -99999:
         alpha_v = "-Infinity"
+    elif alpha == 99999 :
+        alpha_v = "Infinity"
     beta_v = str(beta)
     if beta == 99999 :
         beta_v = "Infinity"
+    elif beta == -99999 :
+        beta_v = "-Infinity"
     node_value = str(value)
     if value == -99999:
         node_value = "-Infinity"
@@ -296,11 +300,11 @@ def print_log(name,depth,value,alpha,beta):
 
 def MAX_VALUE(node,alpha,beta):
     if len(node.children) == 0:
-        #print node.name,0,node.value,alpha,beta
+        print "MAX",node.name,0,node.value,alpha,beta
         print_log(node.name,node.depth,node.value,alpha,beta)
         return node.value
     v = -99999
-    print_log(node.name,node.depth,node.value,alpha,beta)
+    print_log(node.name,node.depth,v,alpha,beta)
     #print node.name,0,node.value,alpha,beta
     for child in node.children:
         x = MIN_VALUE(child,alpha,beta)
@@ -309,32 +313,32 @@ def MAX_VALUE(node,alpha,beta):
             final_move = child.position
             v = x
         node.value = v
+        alpha = max(alpha,v)
         if v >= beta :
-            print_log(node.name,node.depth,node.value,alpha,beta)
+            print_log(node.name,node.depth,v,alpha,beta)
             #print node.name,node.depth,node.value,alpha,beta
             return v
-        alpha = max(alpha,v)
-        print_log(node.name,node.depth,node.value,alpha,beta)
+        print_log(node.name,node.depth,v,alpha,beta)
         #print node.name,node.depth,node.value,alpha,beta
     return v
 
 def MIN_VALUE(node,alpha,beta):
     if len(node.children) == 0:
         print_log(node.name,node.depth,node.value,alpha,beta)
-        #print node.name,node.depth,node.value,alpha,beta
+        print "MIN",node.name,node.depth,node.value,alpha,beta
         return node.value
     v = 99999
-    print_log(node.name,node.depth,node.value,alpha,beta)
+    print_log(node.name,node.depth,v,alpha,beta)
     #print node.name,node.depth,node.value,alpha,beta
     for child in node.children :
         v = min(v,MAX_VALUE(child,alpha,beta))
         node.value = v
+        beta = min(beta,v)
         if v <= alpha :
-            print_log(node.name,node.depth,node.value,alpha,beta)
+            print_log(node.name,node.depth,v,alpha,beta)
             #print node.name,node.depth,node.value,alpha,beta
             return v
-        beta = min(beta,v)
-        print_log(node.name,node.depth,node.value,alpha,beta)
+        print_log(node.name,node.depth,v,alpha,beta)
         #print node.name,node.depth,node.value,alpha,beta
     return v
 
