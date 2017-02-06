@@ -309,8 +309,9 @@ def MAX_VALUE(node,alpha,beta):
     for child in node.children:
         x = MIN_VALUE(child,alpha,beta)
         if x > v :
-            global final_move
-            final_move = child.position
+            if node.name == "root":
+                global final_move
+                final_move = child.position
             v = x
         node.value = v
         old_alpha = alpha
