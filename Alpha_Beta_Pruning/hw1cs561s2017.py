@@ -388,7 +388,7 @@ if __name__ == "__main__":
             value = value + final_board[row][column]
         logs.append(value)
 
-    logs.append("Node,Depth,Value,Alpha,Beta")
+
 
 
     # Final Results
@@ -403,8 +403,9 @@ if __name__ == "__main__":
     with open("output.txt",'w') as file_handler:
         for log in logs:
             file_handler.write(log+'\n')
+        file_handler.write("Node,Depth,Value,Alpha,Beta")
         for execution_order_log in execution_order_logs:
-            file_handler.write(execution_order_log+'\n')
+            file_handler.write('\n'+execution_order_log)
 
     '''for move in validMoves :
         #change the board
