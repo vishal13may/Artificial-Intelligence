@@ -14,7 +14,8 @@ where the board status is denoted by * as blank cell, X as black piece, and O as
 Output format:
 <next state>
 <traverse log>
-where the traverse log requires 5 columns. Each column is separated by “,”. The five columns are node, depth, minimax value, alpha, beta.
+where the traverse log requires 5 columns. Each column is separated by “,”.
+The five columns are node, depth, minimax value, alpha, beta.
 ```
   
 ## Resolution
@@ -26,7 +27,8 @@ Input Format:
 4 2
 1 2 F
 2 3 E
-The first line contains two integers denoting the number of guests \<M\> and the number of tables \<N\> respectively. Each line following contains two integers representing the indices of a pair of guests and one character indicating whether they are Friends (F) or Enemies (E).
+The first line contains two integers denoting the number of guests <M> and the number of tables <N> respectively.
+Each line following contains two integers representing the indices of a pair of guests and one character indicating whether they are Friends (F) or Enemies (E).
 The rest of the pairs are indifferent by default.
 
 Sample Output
@@ -35,7 +37,10 @@ yes
 2 2
 3 1
 4 1
-A single line output yes/no to indicate whether the sentence is satisfiable or not. If the sentence can be satisfied, output yes in the first line, and then provide just one of the possible solutions. (Note that there may be more than one possible solution, but again, your task is to provide only one of them.) Each line after “yes” contains the assigned table for a specific guest for the solution.
+A single line output yes/no to indicate whether the sentence is satisfiable or not.
+If the sentence can be satisfied, output yes in the first line, and then provide just one of the possible solutions.
+Note that there may be more than one possible solution, but again, your task is to provide only one of them.
+Each line after “yes” contains the assigned table for a specific guest for the solution.
 ```
 
 ## Utility using Decision Network
